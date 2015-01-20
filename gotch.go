@@ -2,36 +2,31 @@ package main
 
 import (
 	"fmt"
+	"go/build"
 	"go/parser"
 	"go/token"
+	"regexp"
 )
 
 func main() {
-	fset := token.NewFileSet()
-	// file, err := parser.ParseFile(fset, "../learn-hue-api/main.go", nil, parser.ImportsOnly)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// for key, val := range file.Imports {
-	// 	fmt.Println(key, val)
-	// 	fmt.Printf("%#", val)
-	// 	fmt.Printf("%#", val.Path.Value)
-	// 	imports := make(map[string]*ast.Object)
-	// 	ast.Importer
-	// }
+	imports("../learn-hue-api/main.go")
+}
 
-	path := "../learn-hue-api"
-	pkgs, err := parser.ParseDir(fset, path, nil, parser.ImportsOnly)
+func imports(path string) {
+	fmt.Println(path)
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, path, nil, parser.ImportsOnly)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(len(pkgs))
-	for name, pkg := range pkgs {
-		fmt.Println(name, pkg)
-		fmt.Println(len(pkg.Imports))
-		fmt.Println(pkg.Imports)
-		for id, p := range pkg.Imports {
-			fmt.Println(id, p)
+	for _, val := range file.Imports {
+		re := regexp.MustCompile("^\"(.*)\"$")
+		path := re.ReplaceAllString(val.Path.Value, "$1")
+		fmt.Println(path)
+		pkg, err := build.Import(path, "../", 0)
+		if err != nil {
+			fmt.Println(err)
 		}
+		fmt.Println(pkg.Imports)
 	}
 }
