@@ -10,12 +10,13 @@ import (
 )
 
 func main() {
-	pathes, err := findFiles("../learn-hue-api/main.go")
+	files, err := findFiles("../learn-hue-api/main.go")
 	fmt.Println("==============")
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(pathes)
+	fmt.Println(files)
+	watch(files)
 }
 
 func findFiles(filename string) ([]string, error) {
